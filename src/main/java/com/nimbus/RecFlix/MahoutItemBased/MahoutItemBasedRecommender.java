@@ -19,6 +19,7 @@ import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
 
 public class MahoutItemBasedRecommender implements Recommender {
 
+			      // Private member
                   private final Recommender recommender;
 
                   /**

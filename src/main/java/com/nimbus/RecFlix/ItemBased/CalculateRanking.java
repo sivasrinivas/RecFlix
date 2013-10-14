@@ -44,6 +44,29 @@ class MapValue3{
     }
 }
 
+class MapKey4{
+	String item_name_x;
+	float corr_sim;
+    float cos_sim;
+    float reg_corr_sim;
+    float jaccard_sim;
+    MapKey4(String item_name_x, float corr_sim, float cos_sim, float reg_corr_sim, float jaccard_sim){
+    	this.item_name_x = item_name_x;
+    	this.corr_sim = corr_sim;
+    	this.cos_sim = cos_sim;
+    	this.reg_corr_sim = reg_corr_sim;
+    	this.jaccard_sim = jaccard_sim;
+    }
+}
+
+class MapValue4{
+	String item_name_y;
+	int n;
+    MapValue4(String item_name_y, int n){
+    	this.item_name_y = item_name_y;
+    	this.n = n;
+    }
+}
 
 
 public class CalculateRanking {

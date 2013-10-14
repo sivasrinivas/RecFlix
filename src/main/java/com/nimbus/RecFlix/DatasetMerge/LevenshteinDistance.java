@@ -12,7 +12,7 @@ public class LevenshteinDistance {
 		return Math.min(Math.min(a, b), c);
 	}
 	
-	public static int computeDistance(char[] s, char[] t) {
+	public static int compare(char[] s, char[] t) {
 		
 		int[][] dist = new int[s.length + 1][t.length + 1];
 		

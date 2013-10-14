@@ -29,6 +29,20 @@ class ReduceValue3{
     }
 }
 
+class MapValue3{
+	float corr_sim;
+    float cos_sim;
+    float reg_corr_sim;
+    float jaccard_sim;
+    int n;
+    MapValue3(float corr_sim, float cos_sim, float reg_corr_sim, float jaccard_sim, int n){
+    	this.corr_sim = corr_sim;
+    	this.cos_sim = cos_sim;
+    	this.reg_corr_sim = reg_corr_sim;
+    	this.jaccard_sim = jaccard_sim;
+    	this.n = n;
+    }
+}
 
 
 

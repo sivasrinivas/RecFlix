@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
-import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLJDBCDataModel;
+//import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLJDBCDataModel;
 
 //serializable class not declared
 public class MovieDataModel extends FileDataModel{

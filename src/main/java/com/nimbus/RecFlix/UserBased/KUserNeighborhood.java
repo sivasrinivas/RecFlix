@@ -20,6 +20,8 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
 
+import com.nimbus.RecFlix.UserBased.WordCounter.Map;
+import com.nimbus.RecFlix.UserBased.WordCounter.Reduce;
 
 public class KUserNeighborhood {
 

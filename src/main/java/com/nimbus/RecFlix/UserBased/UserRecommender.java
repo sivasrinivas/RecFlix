@@ -58,13 +58,6 @@ public class UserRecommender {
 			
 			while (values.hasNext()) {
 				String movieRating = values.next().toString();
-				
-//				StringTokenizer tokenizer = new StringTokenizer(movieRating,"#");
-//				movie = tokenizer.nextToken();
-//				rating= tokenizer.nextToken();
-//				count++;
-//				System.out.println("Movie:"+movie+"--"+"rating:"+rating);
-//				avg+=Integer.parseInt(rating);
 				movies.append(movieRating+",");
 			}
 			output.collect(key, new Text(movies.toString()));

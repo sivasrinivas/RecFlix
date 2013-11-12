@@ -18,7 +18,7 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
 
-public class UserRecommender {
+public class UserMovieList {
 
 	// Mapper class
 	public static class Map extends MapReduceBase implements
@@ -58,7 +58,7 @@ public class UserRecommender {
 
 	public static void main(String[] args) throws Exception {
 		// Create a job with configurations
-		JobConf conf = new JobConf(UserRecommender.class);
+		JobConf conf = new JobConf(UserMovieList.class);
 		conf.setJobName("wordcount");
 
 		// setting output datatypes

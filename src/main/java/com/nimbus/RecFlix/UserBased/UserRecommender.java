@@ -32,10 +32,13 @@ public class UserRecommender {
 			String line = value.toString();
 			// tokenize the input string and add each word
 			StringTokenizer tokenizer = new StringTokenizer(line,",");
+			String sUser = tokenizer.nextToken();
+			String sMovie = tokenizer.nextToken();
+			String sRating = tokenizer.nextToken();
 			
-			user.set(tokenizer.nextToken());
-			movie.set(tokenizer.nextToken()+"#"+tokenizer.nextToken());
-			output.collect(user, movie);
+			user.set(sUser+","+sRating);
+			movie.set(sMovie);
+			output.collect(movie, user);
 			
 		}
 	}

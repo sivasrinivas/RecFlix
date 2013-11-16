@@ -49,12 +49,12 @@ public class UserRatings {
 				String[] parts = value.toString().split(",");
 				userCount ++;
 				userRatingSum+=Integer.parseInt(parts[1]);
-				builder.append(parts[1]+"@"+parts[0]+",");
+				builder.append(parts[0]+","+parts[1]+" ");
 			}
-			//remove last extra semicolon
+			//remove last extra space
 			builder.deleteCharAt(builder.length()-1);
 			
-			userRating.set(userCount+","+userRatingSum+"\t"+builder.toString());
+			userRating.set(userCount+","+userRatingSum+"("+builder.toString()+")");
 			context.write(itemId, userRating);
 		}
 	}

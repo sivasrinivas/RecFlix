@@ -24,7 +24,7 @@ public class UserRatings {
 			String line = value.toString();
 			Text itemIdText = new Text();
 			Text userIdRatingText = new Text();
-			
+			System.out.println(line);
 			String[] parts = line.split(",");
 			String itemId =parts[1];
 			String userId = parts[0];
@@ -39,23 +39,26 @@ public class UserRatings {
 	public static class Reduce extends	Reducer<Text, Text, Text, Text> {
 		
 		public void reduce(Text itemId, Iterable<Text> values, Context context)	throws IOException, InterruptedException {
-			StringBuilder builder = new StringBuilder();
-			int userCount = 0;
-			int userRatingSum = 0;
-			Text userRating = new Text();
-			for(Text value : values){
-				//0-userId, 1-rating
-				System.out.println("Values: "+value);
-				String[] parts = value.toString().split(",");
-				userCount ++;
-				userRatingSum+=Integer.parseInt(parts[1]);
-				builder.append(parts[0]+","+parts[1]+" ");
+			try{
+				StringBuilder builder = new StringBuilder();
+				int userCount = 0;
+				int userRatingSum = 0;
+				Text userRating = new Text();
+				for(Text value : values){
+					//0-userId, 1-rating
+					String[] parts = value.toString().split(",");
+					userCount ++;
+					userRatingSum+=Integer.parseInt(parts[1]);
+					builder.append(parts[0]+","+parts[1]+" ");
+				}
+				//remove last extra space
+				builder.deleteCharAt(builder.length()-1);
+				
+				userRating.set(userCount+","+userRatingSum+",("+builder.toString()+")");
+				context.write(itemId, userRating);
+			}catch(Exception e){
+				System.out.println("Got exception :)");
 			}
-			//remove last extra space
-			builder.deleteCharAt(builder.length()-1);
-			
-			userRating.set(userCount+","+userRatingSum+"("+builder.toString()+")");
-			context.write(itemId, userRating);
 		}
 	}
 	

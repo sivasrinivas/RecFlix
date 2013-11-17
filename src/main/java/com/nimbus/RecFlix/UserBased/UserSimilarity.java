@@ -100,9 +100,6 @@ public class UserSimilarity {
 	
 	//combinations
 	public static List<List<String>> lists = new ArrayList<List<String>>();
-	public static void permutate(String[] arr, int k) {
-		internalPermutate(arr, k, 0, 0);
-	}
 
 	public static void internalPermutate(String[] arr, int k, int step, int index) {
 		if (step == k) {
@@ -150,7 +147,7 @@ public class UserSimilarity {
 				//get combinations for array of (userId,rating)
 				if(ratings.length>1){
 					combination(ratings); /*combinations will be set in lists variable*/
-					
+					System.out.println(Arrays.toString(lists.toArray()));
 					for (List<String> combi : lists){
 						String[] s1 = combi.get(0).split(",");
 						String[] s2 = combi.get(1).split(",");
@@ -186,14 +183,16 @@ public class UserSimilarity {
 				sum_y += item_y;
 				sum_x += item_x;
 				count ++;
+				
+				
+				double numerator = count*sum_xy - sum_x*sum_y;
+				double denominator = Math.sqrt(count*sum_xx - sum_x*sum_x)*Math.sqrt(count*sum_yy - sum_y*sum_y);
+				double corr_sim = numerator/denominator;
+				
+				similarity.set(corr_sim+","+count);
+				context.write(userPair, similarity);
 			}
 			
-			double numerator = count*sum_xy - sum_x*sum_y;
-			double denominator = Math.sqrt(count*sum_xx - sum_x*sum_x)*Math.sqrt(count*sum_yy - sum_y*sum_y);
-			double corr_sim = numerator/denominator;
-			
-			similarity.set(corr_sim+","+count);
-			context.write(userPair, similarity);
 		}
 	}
 	

@@ -16,7 +16,11 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import com.nimbus.RecFlix.UserBased.UserSimilarity.Map;
 import com.nimbus.RecFlix.UserBased.UserSimilarity.Reduce;
-
+/**
+ * This class reads user pair and their similarity and adds all similarity values for each user pair
+ * @author priyanka
+ *
+ */
 public class UserRanking {
 
 	public static class Map extends Mapper<LongWritable, Text, Text, Text> {

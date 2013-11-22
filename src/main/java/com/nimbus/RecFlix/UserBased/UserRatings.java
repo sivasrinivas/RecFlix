@@ -12,6 +12,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 /**
+ * This class reads input from dataset and emits list of users and their ratings
  * @author siva
  */
 public class UserRatings {

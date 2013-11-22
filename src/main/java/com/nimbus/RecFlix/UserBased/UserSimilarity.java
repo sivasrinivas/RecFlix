@@ -16,86 +16,11 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import com.nimbus.RecFlix.UserBased.UserRatings.Map;
 import com.nimbus.RecFlix.UserBased.UserRatings.Reduce;
 
-class MapperValueRatings{
-	int userCount;
-	int userRatingSum;
-	HashMap<Integer, Float> ratings;
-	
-	public MapperValueRatings(String input){
-		System.out.println(input);
-		userCount=0;
-		userRatingSum=0;
-		ratings = new HashMap<Integer, Float>();
-	}
-	
-}
-
-class ReducerValueSimilarity{
-	float similarity;
-	public ReducerValueSimilarity(){
-		similarity = 0.0f;
-	}
-}
-
-class UserRating{
-	long userId;
-	double rating;
-}
-
-class UserPair{
-	long userId1;
-	long userId2;
-	double rating1;
-	double rating2;
-	public UserPair(long userId1, long userId2, double rating1, double rating2){
-		this.userId1 = userId1;
-		this.userId2 = userId2;
-	}
-	
-	public UserPair(){
-		userId1=0;
-		userId2=0;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (userId1 ^ (userId1 >>> 32));
-		result = prime * result + (int) (userId2 ^ (userId2 >>> 32));
-		return result;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof UserPair)) {
-			return false;
-		}
-		UserPair other = (UserPair) obj;
-		if (userId1 != other.userId1) {
-			return false;
-		}
-		if (userId2 != other.userId2) {
-			return false;
-		}
-		return true;
-	}
-	
-	
-}
-
+/**
+ * This class reads user ratings for each user and calculates similarity by user pair
+ * @author siva
+ *
+ */
 public class UserSimilarity {
 	
 	//combinations

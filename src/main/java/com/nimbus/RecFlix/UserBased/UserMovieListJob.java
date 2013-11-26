@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileInputFormat;
@@ -19,50 +18,52 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
 
-public class WordCounter {
+public class UserMovieListJob {
 
 	// Mapper class
 	public static class Map extends MapReduceBase implements
-			Mapper<LongWritable, Text, Text, IntWritable> {
-		private final static IntWritable one = new IntWritable(1);
-		private Text word = new Text();
+			Mapper<LongWritable, Text, Text, Text> {
 
-		public void map(LongWritable key, Text value,
-				OutputCollector<Text, IntWritable> output, Reporter reporter)
+		public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
 				throws IOException {
+			Text user = new Text();
+			Text movie = new Text();
+
 			String line = value.toString();
 			// tokenize the input string and add each word
-			StringTokenizer tokenizer = new StringTokenizer(line);
-			while (tokenizer.hasMoreTokens()) {
-				word.set(tokenizer.nextToken());
-				output.collect(word, one);
-			}
+			StringTokenizer tokenizer = new StringTokenizer(line,",");
+			
+			user.set(tokenizer.nextToken());
+			movie.set(tokenizer.nextToken()+"#"+tokenizer.nextToken());
+			output.collect(user, movie);
+			
 		}
 	}
 
 	// Reducer class
-	public static class Reduce extends MapReduceBase implements
-			Reducer<Text, IntWritable, Text, IntWritable> {
-		public void reduce(Text key, Iterator<IntWritable> values,
-				OutputCollector<Text, IntWritable> output, Reporter reporter)
+	public static class Reduce extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
+		
+		public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter)
 				throws IOException {
-			int sum = 0;
+			StringBuilder movies = new StringBuilder();
 			// count sum and set it in output
 			while (values.hasNext()) {
-				sum += values.next().get();
+				String movieRating = values.next().toString();
+				movies.append(movieRating+",");
 			}
-			output.collect(key, new IntWritable(sum));
+			output.collect(key, new Text(movies.toString()));
 		}
+		
 	}
 
 	public static void main(String[] args) throws Exception {
 		// Create a job with configurations
-		JobConf conf = new JobConf(WordCounter.class);
-		conf.setJobName("wordcount");
+		JobConf conf = new JobConf(UserMovieListJob.class);
+		conf.setJobName("User Movie List");
 
 		// setting output datatypes
 		conf.setOutputKeyClass(Text.class);
-		conf.setOutputValueClass(IntWritable.class);
+		conf.setOutputValueClass(Text.class);
 
 		// Mapper and reducer classes
 		conf.setMapperClass(Map.class);

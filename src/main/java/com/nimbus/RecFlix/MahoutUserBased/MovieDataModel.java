@@ -1,4 +1,4 @@
-package com.nimbus.RecFlix.MahoutItemBased;
+package com.nimbus.RecFlix.MahoutUserBased;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
 //import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLJDBCDataModel;
 
-
+//serializable class not declared
 public class MovieDataModel extends FileDataModel{
         public final static String PERFERENCETABLE = "movie_preferences";
         public final static String USERID_COLUMN = "userID";

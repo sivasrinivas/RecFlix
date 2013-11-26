@@ -1,6 +1,4 @@
 package com.nimbus.RecFlix.MahoutUserBased;
-
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -42,7 +40,7 @@ public class MahoutUserBasedRecommender implements Recommender {
                   UserSimilarity userSimilarity = new PearsonCorrelationSimilarity(model);
                 userSimilarity.setPreferenceInferrer(new AveragingPreferenceInferrer(model));
                 UserNeighborhood neighborhood =
-                          new NearestNUserNeighborhood(3, userSimilarity, model);
+                          new NearestNUserNeighborhood(2, userSimilarity, model);
                
                 recommender = new CachingRecommender(new GenericUserBasedRecommender(model, neighborhood, userSimilarity));
           }
@@ -89,4 +87,3 @@ public class MahoutUserBasedRecommender implements Recommender {
               return "UserBasedRecommender[recommender:" + recommender + ']';
             }
 }
-

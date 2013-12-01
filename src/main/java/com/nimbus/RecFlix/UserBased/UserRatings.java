@@ -18,14 +18,13 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 public class UserRatings {
 
 	public static class Map extends Mapper<LongWritable, Text, Text, Text>{
-
-		
 		
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			String line = value.toString();
+//			System.out.println(line);
 			Text itemIdText = new Text();
 			Text userIdRatingText = new Text();
-			System.out.println(line);
+			
 			String[] parts = line.split(",");
 			String itemId =parts[1];
 			String userId = parts[0];
@@ -83,6 +82,8 @@ public class UserRatings {
 		job.setInputFormatClass(TextInputFormat.class);
 		job.setOutputFormatClass(TextOutputFormat.class);
 		
+		System.out.println(args[0]);
+		System.out.println(args[1]);
 		FileInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
 

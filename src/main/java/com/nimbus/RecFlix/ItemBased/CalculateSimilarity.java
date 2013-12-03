@@ -7,123 +7,219 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.*;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
-class ReduceValue1{
-	public int item_count;
-	public int item_sum;
-	public HashMap<String,Float> list;
-	ReduceValue1(int item_count,int item_sum, HashMap<String,Float> list){
-		this.item_count = item_count;
-		this.item_sum = item_sum;
-		this.list = list;
-	}
-	ReduceValue1(int item_count,int item_sum){
-		this.item_count = item_count;
-		this.item_sum = item_sum;
-		this.list = null;
-	}
+import com.nimbus.RecFlix.ItemBased.ItemRatings.Map;
+import com.nimbus.RecFlix.ItemBased.ItemRatings.Reduce;
+
+class MapperValueRatings{
+        int itemCount;
+        int itemRatingSum;
+        HashMap<Integer, Float> ratings;
+        
+        public MapperValueRatings(String input){
+                System.out.println(input);
+                itemCount=0;
+                itemRatingSum=0;
+                ratings = new HashMap<Integer, Float>();
+        }
+        
 }
 
-class ReduceValue2{
-	float corr_sim;
-    float cos_sim;
-    float reg_corr_sim;
-    float jaccard_sim;
-    int n;
-    ReduceValue2(float corr_sim, float cos_sim, float reg_corr_sim, float jaccard_sim, int n){
-    	this.corr_sim = corr_sim;
-    	this.cos_sim = cos_sim;
-    	this.reg_corr_sim = reg_corr_sim;
-    	this.jaccard_sim = jaccard_sim;
-    	this.n = n;
-    }
+class ReducerValueSimilarity{
+        float similarity;
+        public ReducerValueSimilarity(){
+                similarity = 0.0f;
+        }
 }
+
+class ItemRating{
+        String itemId;
+        double rating;
+}
+
+class ItemPair{
+        String itemId1;
+        String itemId2;
+        double rating1;
+        double rating2;
+        public ItemPair(String itemId1, String itemId2, double rating1, double rating2){
+                this.itemId1 = itemId1;
+                this.itemId2 = itemId2;
+        }
+        
+        public ItemPair(){
+                itemId1=null;
+                itemId2=null;
+        }
+
+        /* (non-Javadoc)
+         * @see java.lang.Object#hashCode()
+         */
+      /*  @Override
+        public int hashCode() {
+                final int prime = 31;
+                int result = 1;
+                result = prime * result + (int) (userId1 ^ (userId1 >>> 32));
+                result = prime * result + (int) (userId2 ^ (userId2 >>> 32));
+                return result;
+        }*/
+
+        /* (non-Javadoc)
+         * @see java.lang.Object#equals(java.lang.Object)
+         */
+        @Override
+        public boolean equals(Object obj) {
+                if (this == obj) {
+                        return true;
+                }
+                if (obj == null) {
+                        return false;
+                }
+                if (!(obj instanceof ItemPair)) {
+                        return false;
+                }
+                ItemPair other = (ItemPair) obj;
+                if (itemId1 != other.itemId1) {
+                        return false;
+                }
+                if (itemId2 != other.itemId2) {
+                        return false;
+                }
+                return true;
+        }
+        
+        
+}
+
 public class CalculateSimilarity {
+        
+        //combinations
+        public static List<List<String>> lists = new ArrayList<List<String>>();
 
-	public static ArrayList<HashMap<String,Float>> combination(HashMap<String,Float> val){
-		return null;
-	}
-	
-	public static float correlation(int n, float sum_xy,float sum_x,float sum_y,float sum_xx,float sum_yy){
-		return 0;
-	}
-	
-	public static float regularized_correlation(int n,float sum_xy,float sum_x,float sum_y,float sum_xx,float sum_yy, int k, int j){
-		return 0;
-	}
-	
-	public static float cosine(float sum_xy, double x, double y){
-		return 0;
-	}
-	
-	public static class Map extends Mapper<LongWritable, Text, Set<String>, Collection<Float>> {
+        public static void internalPermutate(String[] arr, int k, int step, int index) {
+                if (step == k) {
+                        List<String> list = new ArrayList<String>();
+                        for (int i = 0; i < k; i++) {
+                                list.add(arr[i]);
+                        }
+                        lists.add(list);
+                }
 
-	//	private Text word = new Text();
+                for (int i = step + index; i < arr.length; i++) {
+                        swap(arr, step, i);
+                        internalPermutate(arr, k, step + 1, i);
+                        swap(arr, step, i);
+                }
+        }
 
-		public void map(String user_id, ReduceValue1 value, Context context)
-				throws IOException, InterruptedException {
-			int item_count = value.item_count,item_sum = value.item_sum;
-			HashMap<String,Float> list = value.list;
-			
-				        for (HashMap<String,Float> combi : combination(list)){
-				        	
-				                    context.write(combi.keySet(), combi.values());
-				        }
-		}
-	}
+        public static void swap(String[] arr, int x, int y) {
+                String temp = arr[x];
+                arr[x] = arr[y];
+                arr[y] = temp;
+        }
 
-	public static class Reduce extends
-	Reducer<Text, IntWritable, Set<String>, ReduceValue2> {
+        public static ArrayList<HashMap<String,Float>> combination(String[] val){
+                
+                internalPermutate(val, 2, 0, 0);
+                return null;
+        }
+        //end of combinations functions
+        
 
-		public void reduce(Set<String> user_pair, Iterable<Collection<Float>> ratings, Context context)
-				throws IOException, InterruptedException {
+        public static class Map extends Mapper<LongWritable, Text, Text, Text> {
 
-			       float sum_xx = 0, sum_xy = 0, sum_yy = 0, sum_x = 0, sum_y = 0;
-			       int n = 0;
-			       Iterator<String> it1 = user_pair.iterator();
-			       String item_xname = it1.next();
-			       String item_yname = it1.next();  
-			       for (Collection<Float> rating: ratings){
-			    	   Iterator<Float> it2 = rating.iterator();
-			    	   Float item_x = it2.next();
-				       Float item_y = it2.next();
-				       sum_xx += item_x * item_x;
-				               sum_yy += item_y * item_y;
-				               sum_xy += item_x * item_y;
-				               sum_y += item_y;
-				               sum_x += item_x;
-				               n += 1;
-			       }
-			
-			      float corr_sim = correlation(n, sum_xy, sum_x, sum_y, sum_xx, sum_yy);
+                public void map(LongWritable itemId, Text value, Context context)        throws IOException, InterruptedException {
+                        Text itemPair = new Text();
+                        Text ratingPair = new Text();
+                        
+                        try{
+                                //userId, itemCount, itemRatingSum,(itemId, rating,...)
+                                System.out.println("values---->"+value);
+                                String line = value.toString();
+                                String itemCount = line.substring(0, line.indexOf(","));
+                                String itemRatingSum = line.substring(line.indexOf(",")+1,line.indexOf(",(") );
+                                String[] ratings = line.substring(line.indexOf(",(")+2, line.indexOf(")")).split(" ");
+                                //get combinations for array of (itemId,rating)
+                                if(ratings.length>1){
+                                        combination(ratings); /*combinations will be set in lists variable*/
+                                        System.out.println(Arrays.toString(lists.toArray()));
+                                        for (List<String> combi : lists){
+                                                String[] s1 = combi.get(0).split(",");
+                                                String[] s2 = combi.get(1).split(",");
+                                                itemPair.set(s1[0]+","+s2[0]);
+                                                ratingPair.set(s1[1]+","+s2[1]);
+                                                //writing to context userPair and their ratings pair
+                                                context.write(itemPair, ratingPair);
+                                        }
+                                        lists = new ArrayList<List<String>>();
+                                }
+                        }catch(Exception e){
+                                System.out.println("Got exception :)");
+                        }
+                        
+                }
+        }
+        
+        
+        public static class Reduce extends Reducer<Text, Text, Text, Text>{
+                public void reduce(Text itemPair, Iterable<Text> ratings, Context context)        throws IOException, InterruptedException {
+                        Text similarity = new Text();
+                        double sum_xx = 0.0, sum_xy = 0.0, sum_yy = 0.0, sum_x = 0.0, sum_y = 0.0;
+                        int count=0;
+                        
+                        for (Text rating: ratings){
+                                String[] r = rating.toString().split(",");
+                                double item_x = Double.parseDouble(r[0]);
+                                double item_y = Double.parseDouble(r[1]);
+                                
+                                sum_xx += item_x * item_x;
+                                sum_yy += item_y * item_y;
+                                sum_xy += item_x * item_y;
+                                sum_y += item_y;
+                                sum_x += item_x;
+                                count ++;
+                                
+                                
+                                double numerator = count*sum_xy - sum_x*sum_y;
+                                double denominator = Math.sqrt(count*sum_xx - sum_x*sum_x)*Math.sqrt(count*sum_yy - sum_y*sum_y);
+                                double corr_sim = numerator/denominator;
+                                
+                                similarity.set(corr_sim+","+count);
+                                context.write(itemPair, similarity);
+                        }
+                        
+                }
+        }
+        
+        /**
+         * @param args
+         * @throws IOException 
+         * @throws InterruptedException 
+         * @throws ClassNotFoundException 
+         */
+        public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+                Configuration conf = new Configuration();
+                Job job = new Job(conf, "calculate_similarity");
+                job.setJarByClass(CalculateSimilarity.class);
+                
+                job.setOutputKeyClass(Text.class);
+                job.setOutputValueClass(Text.class);
+                
+                job.setMapperClass(Map.class);
+                job.setReducerClass(Reduce.class);
 
-			       float reg_corr_sim = regularized_correlation(n, sum_xy, sum_x, sum_y, sum_xx, sum_yy, 10, 0);
+                job.setInputFormatClass(TextInputFormat.class);
+                job.setOutputFormatClass(TextOutputFormat.class);
+                
+                FileInputFormat.addInputPath(job, new Path(args[0]));
+                FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
-			       float cos_sim = cosine(sum_xy, Math.sqrt(sum_xx), Math.sqrt(sum_yy));
+                job.waitForCompletion(true);
+        }
 
-			        float jaccard_sim = 0;
-
-			context.write(user_pair, new ReduceValue2(corr_sim,cos_sim, reg_corr_sim, jaccard_sim, n));
-		}
-	}
-
-	public static void main(String[] args) throws Exception {
-
-		Configuration conf = new Configuration();
-		Job job = new Job(conf, "calculate_similarity");
-		job.setJarByClass(CalculateSimilarity.class);
-		job.setMapperClass(Map.class);
-		job.setCombinerClass(Reduce.class);
-		job.setReducerClass(Reduce.class);
-
-		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(IntWritable.class);
-
-		FileInputFormat.addInputPath(job, new Path(args[0]));
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
-
-		job.waitForCompletion(true);
-	}
 }

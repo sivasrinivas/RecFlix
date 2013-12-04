@@ -235,7 +235,7 @@ public class RecommendationManager{
         }
         
         public static void main(String []args) throws IOException{
-        	BufferedWriter out = new BufferedWriter(new FileWriter("SimUsersList.txt"));
+        		BufferedWriter out = new BufferedWriter(new FileWriter("SimUsersList.txt"));
         	
                 HashMap <String,UserDetails> resultMap = formMapFromResult(); //first function
                 
@@ -261,10 +261,36 @@ public class RecommendationManager{
                 	for(int i = 0;i<result.recomCount;i++){
                 		System.out.println(mrp[i].movieid+":"+mrp[i].movieName+":"+mrp[i].rating);
               	}
-                	
-                	
                 
-          //      ArrayList<Recommendation> resultFinal = setGenreInfo(result);
 
+        }
+        
+        public static UserRecommendation getRecommendationsForUser(String userId) throws IOException{
+        	BufferedWriter out = new BufferedWriter(new FileWriter("SimUsersList.txt"));
+        	
+            HashMap <String,UserDetails> resultMap = formMapFromResult(); //first function
+            
+            Iterator it = resultMap.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String,UserDetails> pairs = (Map.Entry)it.next();
+                UserDetails id = pairs.getValue();
+                out.write(pairs.getKey()+" ");
+                for(UserSimPAir is : id.userSimPairList){
+                	out.write(is.user+","+is.sim);
+                	out.write("xxx");
+                }
+                out.newLine();
+                it.remove();
+            }
+            out.close();
+            
+            UserRecommendation result = formRecommendations(userId); //third function
+            	MovieRatingPair[] mrp =  result.movieid;
+            	System.out.println(result.recomCount);
+            	for(int i = 0;i<result.recomCount;i++){
+            		System.out.println(mrp[i].movieid+":"+mrp[i].movieName+":"+mrp[i].rating);
+          	}
+            
+           return result;
         }
 }

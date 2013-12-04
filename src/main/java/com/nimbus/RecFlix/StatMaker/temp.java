@@ -1,6 +1,9 @@
 package com.nimbus.RecFlix.StatMaker;
 
 
+
+
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -37,6 +40,7 @@ class Recommendation{
 class MovieRatingPair{
         String movieid;
         double rating;
+        public String movieName = null;
         MovieRatingPair(String movieid, double rating){
                 this.movieid = movieid;
                 this.rating = rating;
@@ -71,6 +75,7 @@ class ItemDetails{
 
 class ItemRating implements Comparable<ItemRating>{
         String item;
+        public String itemname = null;
         Double ratingsum = 0.0;
         int count = 0;
         Double avgRating;
@@ -161,6 +166,11 @@ int c = 0;
                 DataInputStream in2 = new DataInputStream(fstream2);
                 BufferedReader br2 = new BufferedReader(new InputStreamReader(in2));
                 String strLine2;
+                
+                FileInputStream fstream4 = new FileInputStream("movie_titles.txt");
+                DataInputStream in4 = new DataInputStream(fstream4);
+                BufferedReader br4 = new BufferedReader(new InputStreamReader(in4));
+                String strLine4;
 
                 LinkedHashMap<String,ItemRating> h2 = new LinkedHashMap<String, ItemRating>();
                 while ((strLine2 = br2.readLine()) != null)   {
@@ -176,6 +186,18 @@ int c = 0;
                         h2.put(item_id, ir);
                 }
                 br2.close();
+                while ((strLine4 = br4.readLine()) != null)   {
+            		  String[] row = strLine4.split(",");
+            		  if(h2.containsKey(row[0])){
+//            			/  MovieRatingPair mp = new MovieRatingPair(row[0], Double.parseDouble(row[1]));
+            			ItemRating ir = h2.get(row[0]);
+            			ir.itemname = row[2];
+            			h2.put(row[0], ir);
+            			//  index1++;
+            		  }
+            	  }
+
+                br4.close();
                 Iterator<String> mapIt = h2.keySet().iterator();
                 int c  = 0;
                 while (mapIt.hasNext()){
@@ -183,11 +205,12 @@ int c = 0;
                            c++;
                            ItemRating value = h2.get(entry);
                            value.avgRating();
-                           out.write(entry+" "+value.avgRating);
+                           out.write(entry+","+value.itemname+","+value.avgRating);
                            out.newLine();
                //            System.out.println(entry+","+value.count+","+value.avgRating+","+c);
                            h2.put(entry, value);
                         }
+          	 
                 out.close();
                 return h2;
                 
@@ -211,6 +234,8 @@ int c = 0;
                 DataInputStream in3 = new DataInputStream(fstream3);
                 BufferedReader br3 = new BufferedReader(new InputStreamReader(in3));
                 String strLine3;
+                
+                
                 
                 int recCount = 0;
                 HashSet<String> recMovList = new HashSet<String>();
@@ -273,15 +298,16 @@ int c = 0;
                 }
                 int index = 0;
                 	  while ((strLine3 = br3.readLine()) != null)   {
-                		  String[] row = strLine3.split(" ");
+                		  String[] row = strLine3.split(",");
                 		  if(recMovList.contains(row[0])){
-                			  MovieRatingPair mp = new MovieRatingPair(row[0], Double.parseDouble(row[1]));
+                			  MovieRatingPair mp = new MovieRatingPair(row[0], Double.parseDouble(row[2]));
+                			  mp.movieName = row[1];
                 			  rec.movieid[index] = mp;
                 			  index++;
                 		  }
                 		  
                 	  }
-                	
+                	  
                 	  
                 	  rec.recomCount = index;
                 	  br1.close();
@@ -370,12 +396,12 @@ int c = 0;
                 }
                 out.close();
                 LinkedHashMap <String,ItemRating> avgRatingMap = findAvgRatingForAll();
-                String userId = "214144";
+                String userId = "1025579";
                 Recommendation result = formRecommendations(userId);
                 	MovieRatingPair[] mrp =  result.movieid;
                 	System.out.println(result.recomCount);
                 	for(int i = 0;i<result.recomCount;i++){
-                		System.out.println(mrp[i].movieid+":"+mrp[i].rating);
+                		System.out.println(mrp[i].movieid+":"+mrp[i].movieName+":"+mrp[i].rating);
                 	}
                 	
                 	

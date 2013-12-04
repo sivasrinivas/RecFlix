@@ -1,0 +1,95 @@
+3,Character,3.688888888888889
+6,Sick,3.0444444444444443
+8,What the #$*! Do We Know!?,3.488888888888889
+1,Dinosaur Planet,3.6222222222222222
+5,The Rise and Fall of ECW,3.9555555555555557
+82,The Frogmen,3.022222222222222
+100,Sam the Iron Bridge,2.7111111111111112
+13,Lord of the Rings: The Return of the King: Extended Edition: Bonus Material,4.644444444444445
+78,Jingle All the Way,3.0
+38,Daydream Obsession,2.2444444444444445
+42,Searching for Paradise,2.3777777777777778
+80,Winter Kills,2.8666666666666667
+23,Clifford: Clifford Saves the Day! / Clifford's Fluffiest Friend Cleo,3.6
+71,Maya Lin: A Strong Clear Vision,3.7555555555555555
+68,Invader Zim,4.0
+63,Crash Dive,3.1777777777777776
+49,Devo: The Complete Truth About De-evolution,3.533333333333333
+10,Fighter,3.2444444444444445
+90,The Lemon Drop Kid,3.533333333333333
+39,Love Reinvented,2.3777777777777778
+56,Carandiru,3.8
+47,The Bad and the Beautiful,3.3333333333333335
+18,Immortal Beloved,3.511111111111111
+41,Horror Vision,1.6
+54,We're Not Married,2.888888888888889
+74,6ixtynin9,3.311111111111111
+85,Elfen Lied,4.155555555555556
+60,The Libertine,2.2222222222222223
+94,G3: Live in Concert,3.7777777777777777
+12,My Favorite Brunette,3.422222222222222
+53,The Bonesetter,1.711111111111111
+69,WWE: Armageddon 2003,3.2
+14,Nature: Antarctica,3.066666666666667
+21,Strange Relations,3.5555555555555554
+15,Neil Diamond: Greatest Hits Live,3.3777777777777778
+50,A Yank in the R.A.F.,2.8666666666666667
+96,Inside the Space Station,3.2222222222222223
+95,Dona Herlinda and Her Son,2.911111111111111
+55,Jade,3.0
+76,I Love Lucy: Season 2,3.7777777777777777
+44,Spitfire Grill,3.6444444444444444
+97,Mostly Martha,4.022222222222222
+43,Silent Service,2.511111111111111
+65,Lost in the Pershing Point Hotel,2.4
+27,Sesame Street: Elmo's World: The Street We Live On,3.8222222222222224
+62,Ken Burns' America: Empire of the Air,3.688888888888889
+70,Tai Chi: The 24 Forms,2.7555555555555555
+81,Antarctica: IMAX,3.422222222222222
+45,The Love Letter,2.911111111111111
+16,Screamers,2.888888888888889
+87,Louder Than Bombs,2.977777777777778
+11,Full Frame: Documentary Shorts,2.7333333333333334
+22,Chump Change,1.8666666666666667
+59,Sex and the Beauties,2.7333333333333334
+75,Grind,2.6666666666666665
+93,They Came Back,2.7111111111111112
+25,Inspector Morse 31: Death Is Now My Neighbour,3.8222222222222224
+48,Justice League,3.8222222222222224
+58,Dragonheart,3.6444444444444444
+28,Lilo and Stitch,3.888888888888889
+64,Outside the Law,2.2888888888888888
+20,Seeta Aur Geeta,3.311111111111111
+92,ECW: Cyberslam '99,3.2888888888888888
+66,Barbarian Queen 2,2.2888888888888888
+52,The Weather Underground,3.8444444444444446
+30,Something's Gotta Give,3.7333333333333334
+72,At Home Among Strangers,2.8444444444444446
+37,Zatoichi's Conspiracy,3.688888888888889
+24,My Bloody Valentine,2.8666666666666667
+26,Never Die Alone,2.8
+17,7 Seconds,3.1777777777777776
+77,Congo,2.511111111111111
+29,Boycott,3.8222222222222224
+84,The Powerpuff Girls Movie,3.2
+46,Rudolph the Red-Nosed Reindeer,3.6222222222222222
+40,Pitcher and the Pin-Up,2.911111111111111
+99,A Fishy Story,2.4
+98,The Battle of Algiers: Bonus Material,3.933333333333333
+86,Iron Monkey 2,1.9333333333333333
+67,Vampire Journals,2.422222222222222
+19,By Dawn's Early Light,3.422222222222222
+36,Lady Chatterley,2.911111111111111
+73,Davy Crockett: 50th Anniversary Double Feature,4.0
+79,The Killing,3.8222222222222224
+83,Silkwood,3.688888888888889
+4,Paula Abdul's Get Up & Dance,2.8666666666666667
+91,WWE: Royal Rumble 2005,4.2
+89,Chain of Command,2.6
+61,Ricky Martin: One Night Only,2.688888888888889
+51,Jonah: A VeggieTales Movie: Bonus Material,3.511111111111111
+57,Richard III,3.7555555555555555
+88,Record of Lodoss War: Chronicles of the Heroic Knight,3.7333333333333334
+2,Isle of Man TT 2004 Review,3.6
+7,8 Man,2.2
+9,Class of Nuke 'Em High 2,2.422222222222222

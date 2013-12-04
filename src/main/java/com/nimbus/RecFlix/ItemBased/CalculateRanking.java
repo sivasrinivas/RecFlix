@@ -8,109 +8,79 @@ import org.apache.hadoop.conf.*;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
-class ReduceValue3{
-	String item_x;
-	String item_y;
-	float corr_sim;
-    float cos_sim;
-    float reg_corr_sim;
-    float jaccard_sim;
-    int n;
-    ReduceValue3(String item_x,String item_y,float corr_sim, float cos_sim, float reg_corr_sim, float jaccard_sim, int n){
-    	this.item_x = item_x;
-    	this.item_y = item_y;
-    	this.corr_sim = corr_sim;
-    	this.cos_sim = cos_sim;
-    	this.reg_corr_sim = reg_corr_sim;
-    	this.jaccard_sim = jaccard_sim;
-    	this.n = n;
-    }
-}
-
-class MapValue3{
-	float corr_sim;
-    float cos_sim;
-    float reg_corr_sim;
-    float jaccard_sim;
-    int n;
-    MapValue3(float corr_sim, float cos_sim, float reg_corr_sim, float jaccard_sim, int n){
-    	this.corr_sim = corr_sim;
-    	this.cos_sim = cos_sim;
-    	this.reg_corr_sim = reg_corr_sim;
-    	this.jaccard_sim = jaccard_sim;
-    	this.n = n;
-    }
-}
-
-class MapKey4{
-	String item_name_x;
-	float corr_sim;
-    float cos_sim;
-    float reg_corr_sim;
-    float jaccard_sim;
-    MapKey4(String item_name_x, float corr_sim, float cos_sim, float reg_corr_sim, float jaccard_sim){
-    	this.item_name_x = item_name_x;
-    	this.corr_sim = corr_sim;
-    	this.cos_sim = cos_sim;
-    	this.reg_corr_sim = reg_corr_sim;
-    	this.jaccard_sim = jaccard_sim;
-    }
-}
-
-class MapValue4{
-	String item_name_y;
-	int n;
-    MapValue4(String item_name_y, int n){
-    	this.item_name_y = item_name_y;
-    	this.n = n;
-    }
-}
-
+import com.nimbus.RecFlix.ItemBased.CalculateSimilarity.Map;
+import com.nimbus.RecFlix.ItemBased.CalculateSimilarity.Reduce;
 
 public class CalculateRanking {
 
+	public static class Map extends Mapper<LongWritable, Text, Text, Text> {
+        
+        public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+        		//itemId1, itemId2, similarity, count
+        		String line = value.toString();
+        		
+        		StringTokenizer st = new StringTokenizer(line);
+        		try{
+        			String[] parts1 = st.nextToken().split(",");
+            		String[] parts2 = st.nextToken().split(",");
+            		
+        			if(Double.parseDouble(parts2[0])>0){
+            			context.write(new Text(parts1[0]+","+parts2[0]), new Text(parts1[1]+","+parts2[1]));
+            		}
+        		}catch(Exception e){
+        			System.out.println("Got exception :)");
+        		}
+        		
+        }
+	}
+	
+	public static class Reduce extends Reducer<Text, Text, Text, Text> {
+            public void reduce(Text keySim, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+            	
+            	for(Text value : values){
+            		String similarCounts = value.toString();
+            		//item1, similarity
+            		String[] parts1 = keySim.toString().split(",");
+            		//item2, count
+            		String[] parts2 = similarCounts.split(",");
+            		
+            		context.write(new Text(parts1[0]+","+parts2[0]), new Text(parts1[1]+","+parts2[1]));
+            		
+            	}
+            	
+            }
+    }
 	
 	
-	public static class Map extends Mapper<LongWritable, Text, MapKey4, MapValue4> {
-		
-		public void map(Set<String> item_keys, MapValue3 value, Context context)
-				throws IOException, InterruptedException {
-			if(value.n > 0){
-				Iterator<String> it  = item_keys.iterator();
-				context.write(new MapKey4(it.next(), value.corr_sim, value.cos_sim, value.reg_corr_sim, value.jaccard_sim), new MapValue4(it.next(), value.n));
-			}
-		}
-	}
-
-	public static class Reduce extends
-	Reducer<Text, IntWritable, Object, ReduceValue3> {
-		public void reduce(MapKey4 key_sim, Iterable<MapValue4> values, Context context)
-				throws IOException, InterruptedException {
-			        	for (MapValue4 value : values){
-				            context.write(null, new ReduceValue3(key_sim.item_name_x, value.item_name_y, key_sim.corr_sim, key_sim.cos_sim, key_sim.reg_corr_sim,
-				            		key_sim.jaccard_sim, value.n));
-			        	}
-
-		}
-	}
-
-	public static void main(String[] args) throws Exception {
-
+	/**
+	 * @param args
+	 * @throws IOException 
+	 * @throws InterruptedException 
+	 * @throws ClassNotFoundException 
+	 */
+	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
 		Configuration conf = new Configuration();
-		Job job = new Job(conf, "calculate_ranking");
+		Job job = new Job(conf, "calc_ranking");
 		job.setJarByClass(CalculateRanking.class);
+		
+		job.setOutputKeyClass(Text.class);
+		job.setOutputValueClass(Text.class);
+		
 		job.setMapperClass(Map.class);
-		job.setCombinerClass(Reduce.class);
 		job.setReducerClass(Reduce.class);
 
-		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(IntWritable.class);
-
+		job.setInputFormatClass(TextInputFormat.class);
+		job.setOutputFormatClass(TextOutputFormat.class);
+		
 		FileInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
 		job.waitForCompletion(true);
+
 	}
+
 }

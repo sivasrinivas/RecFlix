@@ -7,14 +7,10 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.*;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.*;
-import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-
-import com.nimbus.RecFlix.UserBased.UserRatings.Map;
-import com.nimbus.RecFlix.UserBased.UserRatings.Reduce;
 
 /**
  * This class reads user ratings for each user and calculates similarity by user pair
@@ -64,15 +60,16 @@ public class UserSimilarity {
 			
 			try{
 				//itemId, userCount, userRatingSum,(userId, rating,...)
-				System.out.println("values---->"+value);
 				String line = value.toString();
-				String userCount = line.substring(0, line.indexOf(","));
-				String userRatingSum = line.substring(line.indexOf(",")+1,line.indexOf(",(") );
+				//below are not needed
+//				String item = line.substring(0, line.indexOf(","));
+//				String userCount = line.substring(0, line.indexOf(","));
+//				String userRatingSum = line.substring(line.indexOf(",")+1,line.indexOf(",(") );
 				String[] ratings = line.substring(line.indexOf(",(")+2, line.indexOf(")")).split(" ");
 				//get combinations for array of (userId,rating)
 				if(ratings.length>1){
 					combination(ratings); /*combinations will be set in lists variable*/
-					System.out.println(Arrays.toString(lists.toArray()));
+					
 					for (List<String> combi : lists){
 						String[] s1 = combi.get(0).split(",");
 						String[] s2 = combi.get(1).split(",");
@@ -113,6 +110,10 @@ public class UserSimilarity {
 				double numerator = count*sum_xy - sum_x*sum_y;
 				double denominator = Math.sqrt(count*sum_xx - sum_x*sum_x)*Math.sqrt(count*sum_yy - sum_y*sum_y);
 				double corr_sim = numerator/denominator;
+				
+				//if co-relation is NaN, set it to zero to indicate no relation between them
+//				if(Double.isNaN(corr_sim))
+//					corr_sim=0.0;
 				
 				similarity.set(corr_sim+","+count);
 				context.write(userPair, similarity);

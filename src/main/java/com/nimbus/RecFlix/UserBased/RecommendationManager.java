@@ -1,225 +1,270 @@
-/**
- * 
- */
 package com.nimbus.RecFlix.UserBased;
+
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DecimalFormat;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.TreeSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
-import org.apache.commons.math3.util.Decimal64;
+import org.apache.mahout.math.Arrays;
 
-/** This class reads input from user similarity file and initializes recommendation for each user
- * For handling all type of datasets, String datatype is used for all values
- * @author siva
- *
- */
-public class RecommendationManager {
-	HashMap<Integer, UserMovieList> userMovieBase;
-	HashMap<Integer, SimilarUsers> similarUserBase;
-	public RecommendationManager(){
-		userMovieBase = new HashMap<Integer, UserMovieList>();
-		similarUserBase = new HashMap<Integer, SimilarUsers>();
-	}
-	
-	//read data from user pair, similarity file and loads similarUserBase with userid and top10 similar users
-	public void loadSimilarUsersBase(String filePath){
-		 try {
-			BufferedReader br = new BufferedReader(new FileReader(new File(filePath)));
-			String input; //input formar user1, user2, similarity
-			while((input=br.readLine()) != null){
-				String[] parts = input.split(",");
-				int userId1 = Integer.parseInt(parts[0]);
-				int userId2 = Integer.parseInt(parts[1]);
-				double similarity = Double.parseDouble(parts[2]);
-				UserSimilarityPair us = new UserSimilarityPair(userId2, similarity);
-				//check userid already exists in similarUserBase or not
-				if(similarUserBase.containsKey(userId1)){
-					SimilarUsers su = similarUserBase.get(userId1);
-					su.addUser(us);
-				}else{
-					SimilarUsers su = new SimilarUsers(userId1);
-					su.addUser(us);
-					similarUserBase.put(userId1, su);
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+
+class UserRecommendation{
+        public String userid;
+        public MovieRatingPair[] movieid = new MovieRatingPair[10];
+        public int recomCount = 0;
+        public String[] genre = new String[3];
+        public UserRecommendation(String userid) {
+                this.userid = userid;
+        }
+        
+        public void addMovieRatingPair(String movieid, double rating){
+        	if(recomCount<10){
+        		this.movieid[recomCount] = new MovieRatingPair(movieid, rating);
+                recomCount++;
+        	}
+        }
+        
+        public boolean containsMovieId(String movieId){
+        	for(int i=0; i<10; i++){
+        		if(movieid[i]!=null && movieid[i].movieid.equals(movieId))
+        			return true;
+        	}
+        	return false;
+        }
+
+		public void setMovieName(String movieId, String movieName) {
+			for(int i=0; i<10; i++){
+        		if(movieid[i]!=null && movieid[i].movieid.equals(movieId)){
+        			movieid[i].movieName=movieName;
+        		}
+        	}
 		}
-		 
-	}
-	//reads data from file and loads UserMovieBase with userid and their movie list
-	public void loadUserMovieList(String filePath){
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(new File(filePath)));
-			String input; //input format userid, movie1,rating1 movie2,rating2 
-			while((input=br.readLine())!=null){
-				
-				int userId = Integer.parseInt(input.substring(0,input.indexOf(",")));
-				String[] movieList = input.substring(input.indexOf(",")+1).split(" ");
-				List<MovieRatingPair> list = new ArrayList<MovieRatingPair>();
-				for(String movie : movieList){
-					MovieRatingPair mvp = new MovieRatingPair(movie);
-					list.add(mvp);
-				}
-				
-				UserMovieList uml = new UserMovieList(userId, list);
-				userMovieBase.put(userId, uml);
-			}
-			
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void generateRecommendations(String outputPath){
-		try {
-			BufferedWriter br = new BufferedWriter(new FileWriter(new File(outputPath)));
-			for(Integer userId :userMovieBase.keySet()){
-				List<MovieRatingPair> movieList1 = userMovieBase.get(userId).movieList;
-				SimilarUsers su = similarUserBase.get(userId);
-				TreeSet<MovieRatingPair> set = new TreeSet<MovieRatingPair>();
-				
-				UserSimilarityPair similarUser= su.getNextSimilarUser();
-				while(set.size()<10 && similarUser!=null){
-					List<MovieRatingPair> movieList2 = userMovieBase.get(similarUser.userId).movieList;
-					List<MovieRatingPair> duplicateList = new ArrayList<MovieRatingPair>();
-					duplicateList.addAll(movieList2);
-					duplicateList.removeAll(movieList1);
-					set.addAll(duplicateList);
-					//get next user
-					similarUser = su.getNextSimilarUser();
-				}
-				
-				Recommendation r = new Recommendation(userId, set);
-				//add recommednation for userid to file
-				br.write(r.toString());
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-	}
-	
-	public static void main(String[] args){
-		
-		RecommendationManager rm = new RecommendationManager();
-		rm.loadUserMovieList("usermovielist");
-		rm.loadSimilarUsersBase("");
-		rm.generateRecommendations("");
-	}
+}
+
+class MovieRatingPair{
+        String movieid;
+        double rating;
+        public String movieName = null;
+        MovieRatingPair(String movieid, double rating){
+                this.movieid = movieid;
+                this.rating = rating;
+        }
+      //Added by Divya
+    	@Override public String toString() {
+    		StringBuilder str = new StringBuilder(movieid);
+    		str.append(":");
+    		str.append(rating);
+    		return str.toString();
+    	}
+    	//Addition Done
 }
 
 class UserMovieList{
-	int userId;
-	List<MovieRatingPair> movieList;
-	public UserMovieList(int userId, List<MovieRatingPair> movieList){
+	String userId;
+	List<MovieRatingPair> movies;
+	
+	public UserMovieList(String userId){
 		this.userId=userId;
-		this.movieList=movieList;
-	}
-}
-/**
- * This class contaise top10 more similar users list
- * @author siva
- *
- */
-class SimilarUsers{
-	int userId;
-	int limit = 10;
-	PriorityQueue<UserSimilarityPair> simlarUsers;
-	public SimilarUsers(int userId){
-		this.userId=userId;
-		this.simlarUsers=new PriorityQueue<UserSimilarityPair>(10, UserSimilarityPair.similarityComp);
-	}
-	
-	public void addUser(UserSimilarityPair newUser){
-		if(this.simlarUsers.size()<10){
-			this.simlarUsers.add(newUser);
-		}else{
-			if(Double.compare(newUser.similarity, this.simlarUsers.peek().similarity)>0){
-				this.simlarUsers.remove();
-				this.simlarUsers.add(newUser);
-			}
-		}
-	}
-	
-	public UserSimilarityPair getNextSimilarUser(){
-		return this.simlarUsers.remove();
-	}
-	
-}
-
-class UserSimilarityPair{
-	int userId;
-	double similarity;
-	public static Comparator<UserSimilarityPair> similarityComp = new Comparator<UserSimilarityPair>() {
-		
-		public int compare(UserSimilarityPair o1, UserSimilarityPair o2) {
-			return Double.compare(o1.similarity, o2.similarity);
-		}
-	};
-		
-	
-	public UserSimilarityPair(int userId, double similarity){
-		this.userId=userId;
-		this.similarity=similarity;
-	}
-	
-	public UserSimilarityPair(String userSimilarity){
-		String[] parts = userSimilarity.split(",");
-		this.userId=Integer.parseInt(parts[0]);
-		this.similarity=Double.parseDouble(parts[1]);
-	}
-}
-class MovieRatingPair{
-	int movieId;
-	double rating;
-	
-	public MovieRatingPair(int movieId, double rating){
-		this.movieId=movieId;
-		this.rating=rating;
-	}
-	
-	public MovieRatingPair(String moiveRating){
-		String[] parts = moiveRating.split(",");
-		this.movieId=Integer.parseInt(parts[0]);
-		this.rating=Double.parseDouble(parts[1]);
-	}
-}
-
-class Recommendation{
-	int userId;
-	TreeSet<MovieRatingPair> recommendationSet;
-	public Recommendation(int userId, TreeSet<MovieRatingPair> recommendationSet){
-		this.userId=userId;
-		this.recommendationSet = recommendationSet;
+		this.movies=new ArrayList<MovieRatingPair>();
 	}
 	
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
-		DecimalFormat format = new DecimalFormat("0.00");
-		
-		sb.append(userId+"\t");
-		for(MovieRatingPair movie : recommendationSet){
-			sb.append(movie.movieId+","+format.format(movie.rating)+" ");
-		}
+		sb.append(userId);
+		sb.append(Arrays.toString(movies.toArray()));
 		return sb.toString();
 	}
+}
+
+class UserDetails{
+    String userId;
+    List<UserSimPAir> userSimPairList;
+    UserDetails(String userId){
+            userSimPairList = new ArrayList<UserSimPAir>();
+            this.userId = userId;
+    }
+
+    public void insertUser(String user, double sim){
+           userSimPairList.add(new UserSimPAir(user, sim));
+    }
+    
+    public List<UserSimPAir> getIspairList(){
+            return userSimPairList;
+    }
+    
+}
+
+class UserSimPAir{
+        String user;
+        double sim;
+        UserSimPAir(String user, double sim){
+                this.user = user;
+                this.sim = sim;
+        }
+}
+
+public class RecommendationManager{
+        
+        public static HashMap <String,UserDetails>  formMapFromResult() throws IOException{
+                FileInputStream fstream1 = new FileInputStream("UserCoRelation.txt");
+                DataInputStream in1 = new DataInputStream(fstream1);
+                BufferedReader br1 = new BufferedReader(new InputStreamReader(in1));
+                String strLine1;
+                int c = 0;
+                HashMap<String,UserDetails> h = new HashMap<String, UserDetails>();
+                //strLine1 - userId1, userId2, similarity, movie count
+                while ((strLine1 = br1.readLine()) != null)   {
+                //	System.out.println(strLine1.split("	").length);								
+                	if(strLine1.split("	").length > 1 && !strLine1.split("	")[1].split(",")[0].equalsIgnoreCase("NaN")){
+         //       	System.out.println(strLine1.split("	")[1].split(",")[0]);
+                	
+                        String[] row = strLine1.split("	"); 
+                        String[] users = row[0].split(",");
+                        String userA = users[0], userB = users[1], similarity = row[1].split(",")[0];
+                        double sim = Double.parseDouble(similarity);
+                        
+                        UserDetails userDet = null;
+                        if(!h.containsKey(userA))
+                                userDet = new UserDetails(userA);
+                        else
+                                userDet = h.get(userA);
+                        userDet.insertUser(userB, sim);
+                        h.put(userA,userDet);
+                        if(!h.containsKey(userB))
+                                userDet= new UserDetails(userB);
+                        else
+                                userDet = h.get(userB);
+                        userDet.insertUser(userA, sim);
+                        h.put(userB,userDet);
+                	}
+                }
+                br1.close();
+                return h;
+        }
+        
+        
+        public static UserRecommendation formRecommendations(String userId) throws IOException{
+        	
+        	FileInputStream fstream1 = new FileInputStream("SimUsersList.txt");
+            DataInputStream in1 = new DataInputStream(fstream1);
+            BufferedReader br1 = new BufferedReader(new InputStreamReader(in1));
+            String strLine1;
+    	
+    		FileInputStream fstream2 = new FileInputStream("UserMovieList.txt");
+            DataInputStream in2 = new DataInputStream(fstream2);
+            BufferedReader br2 = new BufferedReader(new InputStreamReader(in2));
+            String strLine2;
+    		
+            FileInputStream fstream3 = new FileInputStream("MovieTitles.txt");
+            DataInputStream in3 = new DataInputStream(fstream3);
+            BufferedReader br3 = new BufferedReader(new InputStreamReader(in3));
+            String strLine3;
+            
+            HashSet<String> recMovList = new HashSet<String>();
+            HashMap<String, UserMovieList> similarUsers = new HashMap<String, UserMovieList>();
+            UserMovieList currentUser = new UserMovieList(userId);
+            
+            UserRecommendation rec = new UserRecommendation(userId);
+            
+            String[] simUsers = new String[0];
+                while ((strLine1 = br1.readLine()) != null)   {
+                	
+                	if(strLine1.contains(userId)){
+                		String[] parts = strLine1.split(" ");
+                    	if(parts.length>1){
+                    		simUsers = parts[1].split("xxx");
+                    	}
+                    	for(String s : simUsers){
+                    		String[] userSim = s.split(",");
+                    		UserMovieList um = new UserMovieList(userSim[0]);
+                    		similarUsers.put(userSim[0], um);
+                    	}
+                	}
+                }
+                
+            while ((strLine2 = br2.readLine()) != null)   {
+            	//userid, moviexxxrating...
+            	String[] parts = strLine2.split("\t");
+            	String[] movies = parts[1].split(",");
+            	
+            	if(parts[0].contains(currentUser.userId)){
+            		for(String movie : movies){
+            			String[] m = movie.split("xxx");
+            			currentUser.movies.add(new MovieRatingPair(m[0], Double.parseDouble(m[1])));
+            		}
+            	}
+            	else if(similarUsers.containsKey(parts[0]) ){
+            		UserMovieList user = similarUsers.get(parts[0]);
+            		for(String movie : movies){
+            			String[] m = movie.split("xxx");
+            			user.movies.add(new MovieRatingPair(m[0], Double.parseDouble(m[1])));
+            		}
+            	}
+            }
+            
+            //get movies of A-B and add it to recommendation
+            for(Entry<String, UserMovieList> b : similarUsers.entrySet()){
+            	b.getValue().movies.removeAll(currentUser.movies);
+            	for(MovieRatingPair mr : b.getValue().movies){
+            		rec.addMovieRatingPair(mr.movieid, mr.rating);
+            	}
+            }
+            
+          	 while((strLine3 = br3.readLine())!=null){
+          		 String[] parts = strLine3.split(",");
+          		 if(rec.containsMovieId(parts[0])){
+          			 rec.setMovieName(parts[0], parts[2]);
+          		 }
+          	 }
+           	  br1.close();
+           	  br2.close();
+              br3.close();
+            return rec;
+        }
+        
+        public static void main(String []args) throws IOException{
+        	BufferedWriter out = new BufferedWriter(new FileWriter("SimUsersList.txt"));
+        	
+                HashMap <String,UserDetails> resultMap = formMapFromResult(); //first function
+                
+                Iterator it = resultMap.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry<String,UserDetails> pairs = (Map.Entry)it.next();
+                    UserDetails id = pairs.getValue();
+                    out.write(pairs.getKey()+" ");
+                 //   System.out.println(pairs.getKey() + " = ");
+                    for(UserSimPAir is : id.userSimPairList){
+                    	out.write(is.user+","+is.sim);
+                    	out.write("xxx");
+                    }
+                    out.newLine();
+                    it.remove(); // avoids a ConcurrentModificationException
+                }
+                out.close();
+                
+                String userId = "1109700";
+                UserRecommendation result = formRecommendations(userId); //third function
+                	MovieRatingPair[] mrp =  result.movieid;
+                	System.out.println(result.recomCount);
+                	for(int i = 0;i<result.recomCount;i++){
+                		System.out.println(mrp[i].movieid+":"+mrp[i].movieName+":"+mrp[i].rating);
+              	}
+                	
+                	
+                
+          //      ArrayList<Recommendation> resultFinal = setGenreInfo(result);
+
+        }
 }

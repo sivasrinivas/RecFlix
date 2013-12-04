@@ -34,7 +34,7 @@ public class UserMovieListJob {
 			StringTokenizer tokenizer = new StringTokenizer(line,",");
 			
 			user.set(tokenizer.nextToken());
-			movie.set(tokenizer.nextToken()+"#"+tokenizer.nextToken());
+			movie.set(tokenizer.nextToken()+"xxx"+tokenizer.nextToken());
 			output.collect(user, movie);
 			
 		}
@@ -51,7 +51,11 @@ public class UserMovieListJob {
 				String movieRating = values.next().toString();
 				movies.append(movieRating+",");
 			}
-			output.collect(key, new Text(movies.toString()));
+			String finalString = movies.toString();
+			if(finalString.length()>1){
+				finalString=finalString.substring(0, movies.length()-1);
+			}
+			output.collect(key, new Text(finalString));
 		}
 		
 	}
